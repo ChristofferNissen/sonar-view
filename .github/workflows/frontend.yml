@@ -4,13 +4,14 @@ on:
     # Publish `master` as Docker `latest` image.
     branches:
       - master
-    # Publish `v1.2.3` tags as releases.
-    tags:
-      - v*
+      - main
     paths:
       - 'frontend/*'
   # Run tests for any PRs.
   pull_request:
+    branches:
+      - master
+      - main
 
 jobs:
   build:
@@ -41,9 +42,11 @@ jobs:
           echo "REACT_APP_GOOGLEKEY=20840044614-h4k2pdffbgumpqvri0g1sv5mn4q61q71.apps.googleusercontent.com" > frontend/.env.production
           echo "REACT_APP_URL=https://sonar-survey-rioz6g7rrq-lz.a.run.app/google" >> frontend/.env.production
           docker build frontend/ --file frontend/Dockerfile --tag eu.gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA
+
       # Configure docker to use the gcloud command-line tool as a credential helper
       - run: |
           gcloud auth configure-docker -q
+
       # Push image to Google Container Registry
       - name: Push Image GCR
         run: |-
